@@ -1,0 +1,12 @@
+# Combined dependencies for the entire suite
+
+# From CryptoSuite
+customtkinter
+pyperclip
+
+# From Steganography
+opencv-python
+numpy
+cryptography
+ttkbootstrap
+tkinterdnd2
