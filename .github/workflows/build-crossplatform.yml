@@ -1,0 +1,99 @@
+name: Build cross-platform releases
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.11]
+    runs-on: ${{ matrix.os }}
+    name: Build on ${{ matrix.os }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          # adjust entrypoint name if needed
+          pyinstaller --onefile --name SecureSuite main.py
+          mkdir -p release
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            cp dist/SecureSuite.exe release/ || true
+          else
+            cp dist/SecureSuite release/ || true
+          fi
+      - name: Show dist
+        run: ls -la dist || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SecureSuite-${{ matrix.os }}
+          path: release/**
+
+  publish_release:
+    name: Publish GitHub Release (collects build artifacts)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Ubuntu artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: SecureSuite-ubuntu-latest
+          path: artifacts/ubuntu || true
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: SecureSuite-windows-latest
+          path: artifacts/windows || true
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: SecureSuite-macos-latest
+          path: artifacts/macos || true
+
+      - name: Collect built binaries
+        run: |
+          mkdir -p final_release
+          # copy anything named SecureSuite* from downloaded artifacts
+          find artifacts -type f -name "SecureSuite*" -exec cp {} final_release/ \; || true
+          ls -la final_release
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install -y curl apt-transport-https gnupg
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install -y gh
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Create GitHub Release and upload assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=v${{ github.run_number }}
+          echo "Creating release $TAG and uploading files from final_release/"
+          gh auth setup-git || true
+          gh release create "$TAG" final_release/* --title "SecureSuite $TAG" --notes "Automated build by GitHub Actions run $GITHUB_RUN_ID"
