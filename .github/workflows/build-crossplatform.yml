@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Give GITHUB_TOKEN write permissions for contents so release creation works
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
