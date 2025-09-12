@@ -63,7 +63,7 @@ jobs:
           path: release/**
 
   publish_release:
-    name: Publish GitHub Release (collects build artifacts)
+    name: Publish GitHub Release (collects build artifacts and uploads them)
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -91,20 +91,36 @@ jobs:
           find artifacts -type f -name "SecureSuite*" -exec cp {} final_release/ \; || true
           ls -la final_release
 
-      - name: Create GitHub Release and upload assets
+      - id: create_release
+        name: Create GitHub Release
         uses: actions/create-release@v1
         with:
           tag_name: v${{ github.run_number }}
           release_name: SecureSuite v${{ github.run_number }}
           body: Automated build by GitHub Actions run ${{ github.run_id }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: final_release/*
+      - name: Upload release assets (loop and upload using upload_url)
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          set -e
+          if [ -z "$UPLOAD_URL" ]; then
+            echo "No upload_url from create_release step. Aborting."
+            exit 1
+          fi
+          for f in final_release/*; do
+            if [ -f "$f" ]; then
+              filename=$(basename "$f")
+              echo "Uploading $filename ..."
+              curl --fail -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @"$f" \
+                "$UPLOAD_URL?name=$filename"
+              echo "Uploaded $filename"
+            fi
+          done
