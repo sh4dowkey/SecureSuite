@@ -8,6 +8,11 @@
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
 [![Repo size](https://img.shields.io/github/repo-size/sh4dowkey/SecureSuite?style=for-the-badge)](https://github.com/sh4dowkey/SecureSuite)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg?style=for-the-badge)
+![Code Size](https://img.shields.io/github/languages/code-size/sh4dowkey/SecureSuite?style=for-the-badge)
+
+![Code Size](https://img.shields.io/github/languages/code-size/sh4dowkey/SecureSuite?style=for-the-badge)
+![Languages](https://img.shields.io/github/languages/count/sh4dowkey/SecureSuite?style=for-the-badge)
+![Top Language](https://img.shields.io/github/languages/top/sh4dowkey/SecureSuite?style=for-the-badge)
 
 <img src="./apps/assets/header-dark.webp" width="75%" alt="SecureSuite Header" >
 
