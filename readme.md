@@ -58,7 +58,7 @@ SecureSuite is designed for students, developers, and security enthusiasts who n
   <img src="./apps/assets/hide_msg.webp" alt="Encrypt" width="45%"/>
   <img src="./apps/assets/extract_msg.webp" alt="Decrypt" width="45%"/>
   <br/>
-  <sub>⚡ Hide</sub>   <sub>🔓 Extract</sub>
+  <sub>🕵️‍♂️ Hide</sub>   <sub>🔍 Extract</sub>
 </div>
 
 ---
