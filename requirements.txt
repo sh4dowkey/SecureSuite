@@ -1,12 +1,10 @@
-# Combined dependencies for the entire suite
-
-# From CryptoSuite
-customtkinter
-pyperclip
-
-# From Steganography
-opencv-python
-numpy
-cryptography
-ttkbootstrap
-tkinterdnd2
+customtkinter~=5.2.2
+pyperclip~=1.9.0
+opencv-python~=4.11.0.86
+ttkbootstrap~=1.10.1
+pillow~=11.1.0
+tkinterdnd2~=0.4.3
+numpy~=2.2.3
+cryptography~=44.0.1
+pip~=25.2
+attrs~=25.3.0

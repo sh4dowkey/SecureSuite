@@ -1,5 +1,6 @@
 import customtkinter
 import tkinter
+from tkinter import messagebox
 import webbrowser
 from .gui.encrypt_frame import EncryptFrame
 from .gui.decrypt_frame import DecryptFrame
@@ -9,12 +10,18 @@ import sys
 import os
 
 
+
 class App(customtkinter.CTk):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.title("CryptoSuite")
         self.geometry("1200x700")
         self.minsize(1100, 600)
+
+        # --- NEW: Set the application icon ---
+        # This path is relative from where main.py is run (the project root)
+        self.iconbitmap("apps/assets/logo.ico")
+
         customtkinter.set_appearance_mode("Dark")
         customtkinter.set_default_color_theme("blue")
 
@@ -43,7 +50,7 @@ class App(customtkinter.CTk):
         # --- Navigation Rail (Left Side) ---
         self.navigation_rail = customtkinter.CTkFrame(self.main_body_frame, width=150, corner_radius=0)
         self.navigation_rail.grid(row=0, column=0, sticky="nsw")
-        self.navigation_rail.grid_rowconfigure(4, weight=1)  # Pushes buttons to top
+        self.navigation_rail.grid_rowconfigure(4, weight=1)
 
         self.encrypt_button = customtkinter.CTkButton(self.navigation_rail, text="🔒  Encrypt",
                                                       command=lambda: self.select_frame("encrypt"), corner_radius=0,
@@ -138,10 +145,10 @@ class App(customtkinter.CTk):
         self.config(menu=menu_bar)
 
     def _show_about_dialog(self):
-        """Displays a custom 'About' window with the user-specified text."""
+        """Displays a custom, modern 'About' window with an improved layout."""
         about_window = customtkinter.CTkToplevel(self)
         about_window.title("About CryptoSuite")
-        about_window.geometry("520x420")
+        about_window.geometry("500x380")
         about_window.transient(self)
         about_window.resizable(False, False)
         about_window.grab_set()
@@ -149,63 +156,53 @@ class App(customtkinter.CTk):
         main_frame = customtkinter.CTkFrame(about_window, corner_radius=0)
         main_frame.pack(fill="both", expand=True)
         main_frame.grid_columnconfigure(0, weight=1)
-        main_frame.grid_rowconfigure(2, weight=1)
+        main_frame.grid_rowconfigure(3, weight=1)
 
-        # --- NEW: Using the user's provided text ---
-        title_text = "CryptoSuite v1.0"
-        desc_text = "A modern, recipe-based toolkit for cryptographic operations."
-
-        guide_title_text = "Quick Start Guide:"
-        guide_body_text = (
-            "   •  Enter text in the Input panel.\n"
-            "   •  Choose operations from the left sidebar to build your recipe.\n"
-            "   •  Click \"Bake Recipe!\" to see the final result."
-        )
-
-        footer_text = (
-            "This application is an open-source project created by sh4dowkey, released under the MIT License.\n"
-            "Copyright © 2025 sh4dowkey. All rights reserved."
-        )
-
-        # --- WIDGETS ---
-        title_label = customtkinter.CTkLabel(main_frame, text=title_text,
+        title_label = customtkinter.CTkLabel(main_frame, text="CryptoSuite v1.0",
                                              font=customtkinter.CTkFont(size=24, weight="bold"))
-        title_label.grid(row=0, column=0, padx=20, pady=(20, 5))
+        title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
-        desc_label = customtkinter.CTkLabel(main_frame, text=desc_text, wraplength=480, justify="center")
-        desc_label.grid(row=1, column=0, padx=20, pady=(0, 15))
+        desc_label = customtkinter.CTkLabel(main_frame, text="A modern toolkit for cryptographic operations.",
+                                            wraplength=400, justify="center")
+        desc_label.grid(row=1, column=0, padx=20, pady=5)
 
-        guide_frame = customtkinter.CTkFrame(main_frame, fg_color="transparent")
-        guide_frame.grid(row=2, column=0, padx=20, pady=10, sticky="n")
+        ack_frame = customtkinter.CTkFrame(main_frame, fg_color="transparent")
+        ack_frame.grid(row=2, column=0, padx=20, pady=15)
 
-        guide_title_label = customtkinter.CTkLabel(guide_frame, text=guide_title_text,
-                                                   font=customtkinter.CTkFont(size=16, weight="bold"))
-        guide_title_label.pack(anchor="w")
+        ack_title = customtkinter.CTkLabel(ack_frame, text="Acknowledgements",
+                                           font=customtkinter.CTkFont(size=14, weight="bold"))
+        ack_title.pack()
 
-        guide_body_label = customtkinter.CTkLabel(guide_frame, text=guide_body_text,
-                                                  wraplength=480, justify="left", anchor="w")
-        guide_body_label.pack(anchor="w", pady=(5, 0))
+        ack_text = customtkinter.CTkLabel(ack_frame,
+                                          text="This application is proudly built using Python,\nCustomTkinter, and other open-source libraries.",
+                                          text_color="gray60", justify="center")
+        ack_text.pack(pady=(0, 10))
 
-        # --- Footer Frame ---
-        footer_frame = customtkinter.CTkFrame(main_frame)
-        footer_frame.grid(row=3, column=0, padx=20, pady=20, sticky="s")
+        footer_frame = customtkinter.CTkFrame(main_frame, fg_color="transparent")
+        footer_frame.grid(row=4, column=0, padx=20, pady=20, sticky="s")
+        footer_frame.grid_columnconfigure(0, weight=1)
 
-        footer_label = customtkinter.CTkLabel(footer_frame, text=footer_text,
-                                              font=customtkinter.CTkFont(size=11), text_color="gray60")
-        footer_label.pack(pady=10)
+        separator = customtkinter.CTkFrame(footer_frame, height=1, fg_color="gray25")
+        separator.grid(row=0, column=0, sticky="ew", pady=(0, 15))
 
-        ok_button = customtkinter.CTkButton(main_frame, text="OK", width=120, command=about_window.destroy)
-        ok_button.grid(row=4, column=0, pady=(0, 20), sticky="s")
+        copyright_label = customtkinter.CTkLabel(footer_frame,
+                                                 text="Copyright © 2025 sh4dowkey. Released under the MIT License.",
+                                                 font=customtkinter.CTkFont(size=12), text_color="gray60")
+        copyright_label.grid(row=1, column=0)
+
+        ok_button = customtkinter.CTkButton(footer_frame, text="OK", width=100, command=about_window.destroy)
+        ok_button.grid(row=2, column=0, pady=(15, 0))
 
     def _open_documentation(self):
         """Opens the project's GitHub page in a web browser."""
-        webbrowser.open_new_tab("https://github.com/sh4dowkey/CryptoSuite")
+        webbrowser.open_new_tab("https://github.com/sh4dowkey/SecureSuite")
 
     def launch_steganography(self):
         """Launches the Steganography app in a new window."""
         try:
-            script_path = os.path.join("apps", "steganography", "main.py")
-            subprocess.Popen([sys.executable, script_path])
+            module_path = "apps.steganography.main"
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            subprocess.Popen([sys.executable, "-m", module_path], cwd=project_root)
             self.status_bar.configure(text="Launched Steganography app...")
         except Exception as e:
             self.show_toast("Error", f"Could not launch Steganography app: {e}", "error")

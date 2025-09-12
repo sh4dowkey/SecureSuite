@@ -24,6 +24,10 @@ class SteganographyApp(TkinterDnD.Tk):
         self.title("Steganography Suite")
         self.minsize(900, 700)
 
+        # --- NEW: Set the application icon ---
+        # This path is relative from where main.py is run (the project root)
+        self.iconbitmap("assets/logo.ico")
+
         # --- Create Top Menu Bar ---
         self._create_menu_bar()
 
@@ -113,7 +117,7 @@ class SteganographyApp(TkinterDnD.Tk):
         guide_text.pack(anchor="w", pady=(2, 20))
 
         copyright_text = ttk.Label(main_frame, text="Copyright © 2025 sh4dowkey. Released under the MIT License.",
-                                   bootstyle="secondary",foreground="white")
+                                   bootstyle="secondary", foreground="white")
         copyright_text.pack(side="bottom", pady=10)
 
         ok_button = ttk.Button(main_frame, text="OK", bootstyle="primary", command=about_window.destroy, width=10)
@@ -132,7 +136,7 @@ class SteganographyApp(TkinterDnD.Tk):
         about_window.geometry(f"+{x}+{y}")
 
     def _open_documentation(self):
-        webbrowser.open_new_tab("https://github.com/sh4dowkey/CryptoSuite")
+        webbrowser.open_new_tab("https://github.com/sh4dowkey/SecureSuite")
 
     def launch_cryptosuite(self):
         try:
@@ -164,14 +168,14 @@ class SteganographyApp(TkinterDnD.Tk):
 
     def _create_encrypt_tab(self, parent):
         tab_frame = ttk.Frame(parent, padding=20)
-        # --- FIX: Set left panel to a fixed size and let right panel expand ---
-        tab_frame.grid_columnconfigure(0, weight=0, minsize=450)
-        tab_frame.grid_columnconfigure(1, weight=1)
+        tab_frame.grid_columnconfigure(0, weight=2, uniform="group1")
+        tab_frame.grid_columnconfigure(1, weight=1, uniform="group1")
         tab_frame.grid_rowconfigure(0, weight=1)
 
         controls_frame = ttk.Frame(tab_frame)
         controls_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 20))
         controls_frame.grid_rowconfigure(1, weight=1)
+        controls_frame.grid_columnconfigure(0, weight=1)
 
         ttk.Label(controls_frame, text="Secret Message", font=('-size 12 -weight bold')).grid(row=0, column=0,
                                                                                               sticky="w", pady=(0, 5))
@@ -200,6 +204,16 @@ class SteganographyApp(TkinterDnD.Tk):
         ttk.Button(controls_frame, text="Encrypt & Save Image", command=lambda: self.encrypt_and_save(),
                    bootstyle="success-lg").grid(row=8, column=0, sticky="ew", ipady=8, pady=(10, 0))
 
+        warning_note = ttk.Label(
+            controls_frame,
+            text="⚠️ Important: Messaging apps (WhatsApp, etc.) will destroy the secret message.\nTo share safely, send the saved image as a file or inside a .zip archive or Use a file-sharing service like Google Drive, Dropbox, or email.",
+            wraplength=600,
+            justify="left",
+            bootstyle="secondary",
+            foreground="#B0C4DE"
+        )
+        warning_note.grid(row=9, column=0, sticky="w", pady=(15, 0))
+
         viewer_frame, self.img_container_encrypt, self.img_label_encrypt = self._create_viewer_pane(
             tab_frame,
             dnd_cmd=lambda e: self._load_image(e.data.strip('{}'), is_encrypt=True),
@@ -211,14 +225,14 @@ class SteganographyApp(TkinterDnD.Tk):
 
     def _create_decrypt_tab(self, parent):
         tab_frame = ttk.Frame(parent, padding=20)
-        # --- FIX: Set left panel to a fixed size and let right panel expand ---
-        tab_frame.grid_columnconfigure(0, weight=0, minsize=450)
-        tab_frame.grid_columnconfigure(1, weight=1)
+        tab_frame.grid_columnconfigure(0, weight=2, uniform="group1")
+        tab_frame.grid_columnconfigure(1, weight=1, uniform="group1")
         tab_frame.grid_rowconfigure(0, weight=1)
 
         controls_frame = ttk.Frame(tab_frame)
         controls_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 20))
         controls_frame.grid_rowconfigure(7, weight=1)
+        controls_frame.grid_columnconfigure(0, weight=1)
 
         ttk.Label(controls_frame, text="Password", font=('-size 12 -weight bold')).grid(row=0, column=0, sticky="w",
                                                                                         pady=(0, 5))
@@ -259,7 +273,12 @@ class SteganographyApp(TkinterDnD.Tk):
         return tab_frame
 
     def _create_viewer_pane(self, parent, dnd_cmd, is_encrypt):
-        viewer = ttk.Frame(parent)
+        master_viewer_frame = ttk.Frame(parent)
+        master_viewer_frame.grid_rowconfigure(0, weight=1)
+        master_viewer_frame.grid_columnconfigure(0, weight=1)
+
+        viewer = ttk.Frame(master_viewer_frame, padding=10)
+        viewer.grid(row=0, column=0, sticky="nsew")
         viewer.grid_rowconfigure(0, weight=1)
         viewer.grid_columnconfigure(0, weight=1)
 
@@ -284,7 +303,7 @@ class SteganographyApp(TkinterDnD.Tk):
         ttk.Button(btn_frame, text="Clear", command=lambda: self._clear(is_encrypt), bootstyle="light-outline").grid(
             row=0, column=1, padx=(5, 0), ipady=5, ipadx=10, sticky="ew")
 
-        return viewer, container, label
+        return master_viewer_frame, container, label
 
     def _update_status(self, message, bootstyle="default"):
         self.status_bar.config(text=message, bootstyle=bootstyle)

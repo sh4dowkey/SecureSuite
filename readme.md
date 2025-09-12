@@ -6,8 +6,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
-[![Repo size](https://img.shields.io/github/repo-size/sh4dowkey/SecureSuite?style=for-the-badge)](https://github.com/sh4dowkey/SecureSuite)
+![Code Size](https://img.shields.io/github/languages/code-size/sh4dowkey/SecureSuite?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg?style=for-the-badge)
+
 
 <img src="./apps/assets/header-dark.webp" width="75%" alt="SecureSuite Header" >
 
@@ -38,6 +39,19 @@ SecureSuite is designed for students, developers, and security enthusiasts who n
 
 ---
 
+# ⚠️ Important Warning for Sharing Steganographic Images
+
+Do **not** send the saved image directly through messaging apps like **WhatsApp, Messenger, or social media**.  
+These services apply compression to images, which will **destroy the hidden message**.
+
+### ✅ How to Share Safely
+
+- **On WhatsApp:** When sharing, choose Attach ~> `Document` and select your image file. Do not send from the "Gallery."
+- **Best Method:** Put the image in a `.zip` archive and send the zip file.  
+- **Alternative:** Use a file-sharing service like **Google Drive**, **Dropbox**, or email it as a direct attachment.
+
+---
+
 ## 📸 Showcase
 
 ### CryptoSuite Workflow
@@ -57,7 +71,7 @@ SecureSuite is designed for students, developers, and security enthusiasts who n
   <img src="./apps/assets/hide_msg.webp" alt="Encrypt" width="45%"/>
   <img src="./apps/assets/extract_msg.webp" alt="Decrypt" width="45%"/>
   <br/>
-  <sub>⚡ Hide</sub>   <sub>🔓 Extract</sub>
+  <sub>🕵️‍♂️ Hide</sub>   <sub>🔍 Extract</sub>
 </div>
 
 ---
