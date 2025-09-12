@@ -101,26 +101,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload release assets (loop and upload using upload_url)
+      - name: Upload release assets
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
         run: |
           set -e
-          if [ -z "$UPLOAD_URL" ]; then
-            echo "No upload_url from create_release step. Aborting."
-            exit 1
-          fi
+          # strip {?name,label} if present
+          BASE_URL="${UPLOAD_URL%\{*}"
+          echo "Using upload URL: $BASE_URL"
+
           for f in final_release/*; do
             if [ -f "$f" ]; then
               filename=$(basename "$f")
               echo "Uploading $filename ..."
-              curl --fail -s -X POST \
+              http_code=$(curl -s -o response.txt -w "%{http_code}" \
+                -X POST \
                 -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Content-Type: application/octet-stream" \
                 --data-binary @"$f" \
-                "$UPLOAD_URL?name=$filename"
-              echo "Uploaded $filename"
+                "$BASE_URL?name=$filename")
+
+              echo "Response code: $http_code"
+              cat response.txt
+              if [ "$http_code" -ge 300 ]; then
+                echo "❌ Upload failed for $filename"
+                exit 1
+              fi
             fi
           done
+      
