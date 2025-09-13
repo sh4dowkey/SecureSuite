@@ -10,6 +10,15 @@ import sys
 import os
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class App(customtkinter.CTk):
     def __init__(self, **kwargs):
@@ -18,9 +27,8 @@ class App(customtkinter.CTk):
         self.geometry("1200x700")
         self.minsize(1100, 600)
 
-        # --- NEW: Set the application icon ---
-        # This path is relative from where main.py is run (the project root)
-        self.iconbitmap("apps/assets/logo.ico")
+        # usage
+        self.iconbitmap(resource_path("apps/assets/logo.ico"))
 
         customtkinter.set_appearance_mode("Dark")
         customtkinter.set_default_color_theme("blue")

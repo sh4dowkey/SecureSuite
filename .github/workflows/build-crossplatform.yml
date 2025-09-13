@@ -42,14 +42,36 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          pyinstaller --onefile --name SecureSuite --distpath release main.py
+          pyinstaller --onefile --windowed `
+            --name SecureSuite `
+            --distpath release `
+            --icon=apps/assets/logo.ico `
+            --add-data "apps/assets/logo.ico;apps/assets" `
+            main.py
           Get-ChildItem -Path release
 
-      - name: Build with PyInstaller (Linux / macOS)
-        if: runner.os != 'Windows'
+      - name: Build with PyInstaller (Linux)
+        if: runner.os == 'Linux'
         shell: bash
         run: |
-          pyinstaller --onefile --name SecureSuite --distpath release main.py
+          pyinstaller --onefile --windowed \
+            --name SecureSuite \
+            --distpath release \
+            --icon=apps/assets/logo.png \
+            --add-data "apps/assets/logo.ico:apps/assets" \
+            main.py
+          ls -la release || true
+
+      - name: Build with PyInstaller (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          pyinstaller --onefile --windowed \
+            --name SecureSuite \
+            --distpath release \
+            --icon=apps/assets/logo.icns \
+            --add-data "apps/assets/logo.ico:apps/assets" \
+            main.py
           ls -la release || true
 
       - name: Upload build artifact

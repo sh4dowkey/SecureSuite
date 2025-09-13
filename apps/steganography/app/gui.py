@@ -13,10 +13,12 @@ import webbrowser
 
 # Import the core logic from our new core.py file
 from .core import encrypt_message, decrypt_message, encode_lsb, decode_lsb
+from ...cryptosuite.app import resource_path
 
 
 class SteganographyApp(TkinterDnD.Tk):
     """A secure steganography tool with a modern GUI."""
+
 
     def __init__(self):
         super().__init__()
@@ -26,7 +28,7 @@ class SteganographyApp(TkinterDnD.Tk):
 
         # --- NEW: Set the application icon ---
         # This path is relative from where main.py is run (the project root)
-        self.iconbitmap("assets/logo.ico")
+        self.iconbitmap(resource_path("assets/logo.ico"))
 
         # --- Create Top Menu Bar ---
         self._create_menu_bar()
