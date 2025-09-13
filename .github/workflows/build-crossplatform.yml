@@ -42,35 +42,23 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          pyinstaller --onefile --windowed `
+          pyinstaller --onefile --noconsole `
             --name SecureSuite `
             --distpath release `
             --icon=assets/logo.ico `
-            --add-data "assets/logo.ico;assets" `
+            --add-data "assets;assets" `
             main.py
           Get-ChildItem -Path release
 
-      - name: Build with PyInstaller (Linux)
-        if: runner.os == 'Linux'
+      - name: Build with PyInstaller (Linux / macOS)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
-          pyinstaller --onefile --windowed \
-            --name SecureSuite \
-            --distpath release \
-            --icon=assets/logo.png \
-            --add-data "logo.ico:assets" \
-            main.py
-          ls -la release || true
-
-      - name: Build with PyInstaller (macOS)
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          pyinstaller --onefile --windowed \
+          pyinstaller --onefile --noconsole \
             --name SecureSuite \
             --distpath release \
             --icon=assets/logo.icns \
-            --add-data "assets/logo.ico:assets" \
+            --add-data "assets:assets" \
             main.py
           ls -la release || true
 
