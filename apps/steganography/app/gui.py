@@ -1,3 +1,5 @@
+import tkinter
+
 import cv2
 import os
 import tkinter as tk
@@ -26,9 +28,20 @@ class SteganographyApp(TkinterDnD.Tk):
         self.title("Steganography Suite")
         self.minsize(900, 700)
 
+        # --- FIX: Hide the window immediately after creation ---
+        self.withdraw()
+
         # --- NEW: Set the application icon ---
         # This path is relative from where main.py is run (the project root)
-        self.iconbitmap(resource_path("assets/logo.ico"))
+        try:
+            if "win" in sys.platform:
+                self.iconbitmap(resource_path("assets/logo.ico"))
+            else:
+                # For macOS & Linux, use PhotoImage. PyInstaller will handle the .icns for the final macOS app bundle.
+                logo_image = tkinter.PhotoImage(file=resource_path("assets/logo.png"))
+                self.iconphoto(True, logo_image)
+        except Exception as e:
+            print(f"Error setting icon: {e}")  # Prevents crash if icon is missing
 
         # --- Create Top Menu Bar ---
         self._create_menu_bar()
@@ -54,7 +67,9 @@ class SteganographyApp(TkinterDnD.Tk):
 
         self._create_main_content_widgets()
 
+        # --- FIX: Reveal the window only when it is fully built ---
         self.deiconify()
+
 
     def _create_menu_bar(self):
         menu_bar = tk.Menu(self)

@@ -1,6 +1,7 @@
 import customtkinter
 import tkinter
 from tkinter import messagebox
+from PIL import Image
 import webbrowser
 from .gui.encrypt_frame import EncryptFrame
 from .gui.decrypt_frame import DecryptFrame
@@ -15,7 +16,7 @@ def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     return os.path.join(base_path, relative_path)
 
@@ -28,7 +29,15 @@ class App(customtkinter.CTk):
         self.minsize(1100, 600)
 
         # usage
-        self.iconbitmap(resource_path("apps/assets/logo.ico"))
+        try:
+            if "win" in sys.platform:
+                self.iconbitmap(resource_path("assets/logo.ico"))
+            else:
+                # For macOS & Linux, use PhotoImage. PyInstaller will handle the .icns for the final macOS app bundle.
+                logo_image = tkinter.PhotoImage(file=resource_path("assets/logo.png"))
+                self.iconphoto(True, logo_image)
+        except Exception as e:
+            print(f"Error setting icon: {e}")  # Prevents crash if icon is missing
 
         customtkinter.set_appearance_mode("Dark")
         customtkinter.set_default_color_theme("blue")
@@ -44,11 +53,25 @@ class App(customtkinter.CTk):
 
         self.header_frame = customtkinter.CTkFrame(self, height=60, corner_radius=0)
         self.header_frame.grid(row=0, column=0, sticky="ew")
-        self.header_frame.grid_columnconfigure(0, weight=1)
-        self.app_name_label = customtkinter.CTkLabel(self.header_frame, text="CryptoSuite 🔐",
+        # Configure columns to place logo and text on the left, and push everything else to the right
+        self.header_frame.grid_columnconfigure(0, weight=0)  # Logo column
+        self.header_frame.grid_columnconfigure(1, weight=0)  # Text column
+        self.header_frame.grid_columnconfigure(2, weight=1)  # Empty expanding column
+
+        # Load the logo image
+        logo_pil_image = Image.open(resource_path("assets/logo.png"))
+
+        logo_image = customtkinter.CTkImage(light_image=logo_pil_image, size=(35, 35))
+
+        # Create a label for the logo
+        logo_label = customtkinter.CTkLabel(self.header_frame, image=logo_image, text="")
+        logo_label.grid(row=0, column=0, padx=(20, 10), pady=15, sticky="w")
+
+        # Update the original title label (emoji removed for a cleaner look)
+        self.app_name_label = customtkinter.CTkLabel(self.header_frame, text="CryptoSuite",
                                                      font=customtkinter.CTkFont(family="Helvetica", size=24,
                                                                                 weight="bold"))
-        self.app_name_label.grid(row=0, column=0, padx=20, pady=15, sticky="w")
+        self.app_name_label.grid(row=0, column=1, padx=0, pady=15, sticky="w")
 
         self.main_body_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         self.main_body_frame.grid(row=1, column=0, sticky="nsew")
@@ -141,7 +164,7 @@ class App(customtkinter.CTk):
 
         # --- Tools Menu ---
         tools_menu = tkinter.Menu(menu_bar, tearoff=0, font=menu_font)
-        tools_menu.add_command(label="Hide Secret in Image...", command=self.launch_steganography)
+        tools_menu.add_command(label="Open Steganography suite...", command=self.launch_steganography)
         menu_bar.add_cascade(label="Tools", menu=tools_menu)
 
         # --- Help Menu ---

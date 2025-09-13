@@ -58,8 +58,8 @@ These services apply compression to images, which will **destroy the hidden mess
 #### ⚡ Encryption & Decryption
 
 <div align="center">
-  <img src="./apps/assets/encrypt.webp" alt="Encrypt" width="45%"/>
-  <img src="./apps/assets/decrypt.webp" alt="Decrypt" width="45%"/>
+  <img src="./assets/encrypt.webp" alt="Encrypt" width="45%"/>
+  <img src="./assets/decrypt.webp" alt="Decrypt" width="45%"/>
   <br/>
   <sub>⚡ Encryption</sub>   <sub>🔓 Decryption</sub>
 </div>
@@ -68,8 +68,8 @@ These services apply compression to images, which will **destroy the hidden mess
 #### ⚡ Hide & Extract Message
 
 <div align="center">
-  <img src="./apps/assets/hide_msg.webp" alt="Encrypt" width="45%"/>
-  <img src="./apps/assets/extract_msg.webp" alt="Decrypt" width="45%"/>
+  <img src="./assets/hide_msg.webp" alt="Encrypt" width="45%"/>
+  <img src="./assets/extract_msg.webp" alt="Decrypt" width="45%"/>
   <br/>
   <sub>🕵️‍♂️ Hide</sub>   <sub>🔍 Extract</sub>
 </div>
@@ -165,10 +165,12 @@ SecureSuite/
 ├── main.py              # The main launcher for the entire suite
 ├── requirements.txt     # All combined dependencies
 │
-└── apps/
-    ├── cryptosuite/     # Contains the CryptoSuite application
-    └── steganography/   # Contains the Steganography application
-
+├── apps/
+│   ├── cryptosuite/     # Contains the CryptoSuite application
+│   └── steganography/   # Contains the Steganography application
+│
+└── assets/              # Contains all the images and logos
+ 
 ```
 
 ## 🛣️ Roadmap
