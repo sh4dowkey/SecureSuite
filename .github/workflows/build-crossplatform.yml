@@ -1,13 +1,9 @@
-name: Build cross-platform releases
+name: Build cross-platform artifacts
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
-# Give GITHUB_TOKEN write permissions for contents so release creation works
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -56,79 +52,8 @@ jobs:
           pyinstaller --onefile --name SecureSuite --distpath release main.py
           ls -la release || true
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: SecureSuite-${{ matrix.os }}
           path: release/**
-
-  publish_release:
-    name: Publish GitHub Release (collects build artifacts and uploads them)
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Ubuntu artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: SecureSuite-ubuntu-latest
-          path: artifacts/ubuntu || true
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: SecureSuite-windows-latest
-          path: artifacts/windows || true
-
-      - name: Download macOS artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: SecureSuite-macos-latest
-          path: artifacts/macos || true
-
-      - name: Collect built binaries
-        run: |
-          mkdir -p final_release
-          find artifacts -type f -name "SecureSuite*" -exec cp {} final_release/ \; || true
-          ls -la final_release
-
-      - id: create_release
-        name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: SecureSuite v${{ github.run_number }}
-          body: Automated build by GitHub Actions run ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload release assets
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
-        run: |
-          set -e
-          # strip {?name,label} if present
-          BASE_URL="${UPLOAD_URL%\{*}"
-          echo "Using upload URL: $BASE_URL"
-
-          for f in final_release/*; do
-            if [ -f "$f" ]; then
-              filename=$(basename "$f")
-              echo "Uploading $filename ..."
-              http_code=$(curl -s -o response.txt -w "%{http_code}" \
-                -X POST \
-                -H "Authorization: token $GITHUB_TOKEN" \
-                -H "Content-Type: application/octet-stream" \
-                --data-binary @"$f" \
-                "$BASE_URL?name=$filename")
-
-              echo "Response code: $http_code"
-              cat response.txt
-              if [ "$http_code" -ge 300 ]; then
-                echo "❌ Upload failed for $filename"
-                exit 1
-              fi
-            fi
-          done
-      
