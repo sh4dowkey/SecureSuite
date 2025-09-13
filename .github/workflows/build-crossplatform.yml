@@ -45,8 +45,8 @@ jobs:
           pyinstaller --onefile --windowed `
             --name SecureSuite `
             --distpath release `
-            --icon=apps/assets/logo.ico `
-            --add-data "apps/assets/logo.ico;apps/assets" `
+            --icon=assets/logo.ico `
+            --add-data "assets/logo.ico;assets" `
             main.py
           Get-ChildItem -Path release
 
@@ -57,8 +57,8 @@ jobs:
           pyinstaller --onefile --windowed \
             --name SecureSuite \
             --distpath release \
-            --icon=apps/assets/logo.png \
-            --add-data "apps/assets/logo.ico:apps/assets" \
+            --icon=assets/logo.png \
+            --add-data "logo.ico:assets" \
             main.py
           ls -la release || true
 
@@ -69,8 +69,8 @@ jobs:
           pyinstaller --onefile --windowed \
             --name SecureSuite \
             --distpath release \
-            --icon=apps/assets/logo.icns \
-            --add-data "apps/assets/logo.ico:apps/assets" \
+            --icon=assets/logo.icns \
+            --add-data "assets/logo.ico:assets" \
             main.py
           ls -la release || true
 
