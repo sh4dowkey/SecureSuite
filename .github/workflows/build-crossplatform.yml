@@ -42,7 +42,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          pyinstaller --onedir --noconsole `
+          pyinstaller --onedir --windowed `
             --name SecureSuite `
             --distpath release `
             --icon=assets/logo.ico `
@@ -54,7 +54,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          pyinstaller --onedir --noconsole \
+          pyinstaller --onedir --windowed \
             --name SecureSuite \
             --distpath release \
             --icon=assets/logo.icns \
