@@ -8,6 +8,44 @@ import queue
 from tkinter import filedialog
 
 
+class CollapsibleFrame(customtkinter.CTkFrame):
+    """
+    A collapsible frame widget for customtkinter, used to create an accordion-style menu.
+    """
+    def __init__(self, master, text="", **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.collapsed = True
+
+        self.header_frame = customtkinter.CTkFrame(self, fg_color="transparent")
+        self.header_frame.grid(row=0, column=0, sticky="ew")
+        self.header_frame.grid_columnconfigure(1, weight=1)
+
+        self.toggle_button = customtkinter.CTkButton(self.header_frame, text="▶", width=30,
+                                                     fg_color="transparent", hover_color="#333333",
+                                                     command=self.toggle)
+        self.toggle_button.grid(row=0, column=0, sticky="w")
+
+        self.title_label = customtkinter.CTkLabel(self.header_frame, text=text,
+                                                  font=customtkinter.CTkFont(size=14, weight="bold"))
+        self.title_label.grid(row=0, column=1, sticky="w")
+
+        self.content_frame = customtkinter.CTkFrame(self, fg_color="transparent")
+        # The content_frame is not gridded initially
+
+    def toggle(self):
+        if self.collapsed:
+            self.content_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+            self.toggle_button.configure(text="▼")
+            self.collapsed = False
+        else:
+            self.content_frame.grid_forget()
+            self.toggle_button.configure(text="▶")
+            self.collapsed = True
+
+
 class BaseFrame(customtkinter.CTkFrame):
     def __init__(self, master, app, status_bar, **kwargs):
         super().__init__(master, **kwargs)
@@ -282,7 +320,6 @@ class BaseFrame(customtkinter.CTkFrame):
         input_controls.grid(row=0, column=0, padx=10, pady=(0, 5), sticky="ew")
         customtkinter.CTkLabel(input_controls, text="Input", font=customtkinter.CTkFont(size=16)).pack(side="left")
 
-        # --- COLOR CHANGE: From orange to a neutral dark grey ---
         customtkinter.CTkButton(input_controls, text="❌ Clear", width=80, command=self.clear_input,
                                 fg_color="#565b5e", hover_color="#62686b").pack(side="right", padx=(5, 0))
 
@@ -298,7 +335,6 @@ class BaseFrame(customtkinter.CTkFrame):
         customtkinter.CTkLabel(output_controls, text="Final Output", font=customtkinter.CTkFont(size=16)).pack(
             side="left")
 
-        # --- COLOR CHANGE: From orange to a neutral dark grey ---
         customtkinter.CTkButton(output_controls, text="❌ Clear", width=80, command=self.clear_output,
                                 fg_color="#565b5e", hover_color="#62686b").pack(side="right", padx=(5, 0))
 

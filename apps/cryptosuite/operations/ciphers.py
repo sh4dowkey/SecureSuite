@@ -34,3 +34,19 @@ def caesar_cipher(text: str, shift: int, decrypt: bool = False) -> tuple[bool, s
             result += char
 
     return True, result
+
+
+def atbash_cipher(text: str) -> tuple[bool, str]:
+    """
+    Encrypts or decrypts text using the Atbash cipher method.
+    The cipher is reciprocal, so encryption and decryption are the same.
+    """
+    result = ""
+    for char in text:
+        if 'a' <= char <= 'z':
+            result += chr(ord('z') - ord(char) + ord('a'))
+        elif 'A' <= char <= 'Z':
+            result += chr(ord('Z') - ord(char) + ord('A'))
+        else:
+            result += char
+    return True, result

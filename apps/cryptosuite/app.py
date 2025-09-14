@@ -59,7 +59,7 @@ class App(customtkinter.CTk):
         self.header_frame.grid_columnconfigure(2, weight=1)  # Empty expanding column
 
         # Load the logo image
-        logo_pil_image = Image.open(resource_path("assets/logo.png"))
+        logo_pil_image = Image.open(resource_path("assets/header_image.png"))
 
         logo_image = customtkinter.CTkImage(light_image=logo_pil_image, size=(35, 35))
 

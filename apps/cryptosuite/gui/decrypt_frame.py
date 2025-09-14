@@ -1,7 +1,7 @@
 import customtkinter
 import json
 from tkinter import filedialog
-from .base_frame import BaseFrame
+from .base_frame import BaseFrame, CollapsibleFrame # Make sure CollapsibleFrame is in base_frame.py
 from ..operations.encoders import from_base64
 from ..operations.ciphers import caesar_cipher
 from ..operations.hex import from_hex
@@ -25,6 +25,7 @@ class DecryptFrame(BaseFrame):
         super().__init__(master, app, status_bar, **kwargs)
 
     def execute_operation(self, operation_name, input_data, step_frame):
+        # This function will need to be expanded to handle all the new operations.
         if operation_name == "From Base64":
             return from_base64(input_data)
         elif operation_name == "From Hex":
@@ -45,38 +46,56 @@ class DecryptFrame(BaseFrame):
     def create_operations_sidebar(self):
         sidebar_frame = customtkinter.CTkFrame(self)
         sidebar_frame.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=10)
-        sidebar_frame.grid_rowconfigure(1, weight=1);
+        sidebar_frame.grid_rowconfigure(1, weight=1)
         sidebar_frame.grid_columnconfigure(0, weight=1)
+
         customtkinter.CTkLabel(sidebar_frame, text="Operations",
                                font=customtkinter.CTkFont(size=18, weight="bold")).grid(row=0, column=0, padx=20,
                                                                                         pady=(10, 10))
+
         scrollable_frame = customtkinter.CTkScrollableFrame(sidebar_frame, fg_color="transparent", corner_radius=0)
-        scrollable_frame.grid(row=1, column=0, sticky="nsew", pady=(10, 0));
+        scrollable_frame.grid(row=1, column=0, sticky="nsew", pady=(10, 0))
         scrollable_frame.grid_columnconfigure(0, weight=1)
 
-        decoder_label = customtkinter.CTkLabel(scrollable_frame, text="Decoders",
-                                               font=customtkinter.CTkFont(weight="bold"))
-        decoder_label.grid(row=0, column=0, pady=(5, 2), padx=10, sticky="w")
+        # --- Helper to create buttons with better padding ---
+        def add_button(parent, text, command):
+            button = customtkinter.CTkButton(parent, text=text, anchor="w", command=command)
+            button.pack(fill="x", padx=5, pady=4) # Increased padding for better spacing
 
-        from_base64_btn = customtkinter.CTkButton(scrollable_frame, text="From Base64", anchor="w",
-                                                  command=lambda: self.add_recipe_step("From Base64"))
-        from_base64_btn.grid(row=1, column=0, sticky="ew", padx=10, pady=2)
+        # --- Section: Data Formats & Decoders ---
+        decoders_frame = CollapsibleFrame(scrollable_frame, text="Data Formats & Decoders")
+        decoders_frame.pack(fill="x", pady=(0, 5))
+        add_button(decoders_frame.content_frame, "From Base64", lambda: self.add_recipe_step("From Base64"))
+        add_button(decoders_frame.content_frame, "From Base32", lambda: self.add_recipe_step("From Base32"))
+        add_button(decoders_frame.content_frame, "From Base58", lambda: self.add_recipe_step("From Base58"))
+        add_button(decoders_frame.content_frame, "From Hex", lambda: self.add_recipe_step("From Hex"))
+        add_button(decoders_frame.content_frame, "URL Decode", lambda: self.add_recipe_step("URL Decode"))
+        add_button(decoders_frame.content_frame, "From Binary", lambda: self.add_recipe_step("From Binary"))
+        add_button(decoders_frame.content_frame, "From Morse Code", lambda: self.add_recipe_step("From Morse Code"))
 
-        from_hex_btn = customtkinter.CTkButton(scrollable_frame, text="From Hex", anchor="w",
-                                               command=lambda: self.add_recipe_step("From Hex"))
-        from_hex_btn.grid(row=2, column=0, sticky="ew", padx=10, pady=2)
+        # --- Section: Classic Ciphers ---
+        classic_ciphers_frame = CollapsibleFrame(scrollable_frame, text="Classic Ciphers")
+        classic_ciphers_frame.pack(fill="x", pady=(0, 5))
+        add_button(classic_ciphers_frame.content_frame, "Caesar Decrypt", lambda: self.add_recipe_step("Caesar Decrypt"))
+        add_button(classic_ciphers_frame.content_frame, "Atbash Cipher", lambda: self.add_recipe_step("Atbash Cipher"))
+        add_button(classic_ciphers_frame.content_frame, "ROT13 Cipher", lambda: self.add_recipe_step("ROT13 Cipher"))
+        add_button(classic_ciphers_frame.content_frame, "Vigenère Decrypt", lambda: self.add_recipe_step("Vigenère Decrypt"))
+        add_button(classic_ciphers_frame.content_frame, "Playfair Decrypt", lambda: self.add_recipe_step("Playfair Decrypt"))
+        add_button(classic_ciphers_frame.content_frame, "Rail Fence Decrypt", lambda: self.add_recipe_step("Rail Fence Decrypt"))
 
-        cipher_label = customtkinter.CTkLabel(scrollable_frame, text="Ciphers",
-                                              font=customtkinter.CTkFont(weight="bold"))
-        cipher_label.grid(row=3, column=0, pady=(15, 2), padx=10, sticky="w")
+        # --- Section: Symmetric Decryption ---
+        symmetric_frame = CollapsibleFrame(scrollable_frame, text="Symmetric Decryption")
+        symmetric_frame.pack(fill="x", pady=(0, 5))
+        add_button(symmetric_frame.content_frame, "AES Decrypt", lambda: self.add_recipe_step("AES Decrypt"))
+        add_button(symmetric_frame.content_frame, "Blowfish Decrypt", lambda: self.add_recipe_step("Blowfish Decrypt"))
+        add_button(symmetric_frame.content_frame, "Twofish Decrypt", lambda: self.add_recipe_step("Twofish Decrypt"))
+        add_button(symmetric_frame.content_frame, "Serpent Decrypt", lambda: self.add_recipe_step("Serpent Decrypt"))
+        add_button(symmetric_frame.content_frame, "ChaCha20-Poly1305", lambda: self.add_recipe_step("ChaCha20-Poly1305"))
 
-        caesar_decrypt_btn = customtkinter.CTkButton(scrollable_frame, text="Caesar Decrypt", anchor="w",
-                                                     command=lambda: self.add_recipe_step("Caesar Decrypt"))
-        caesar_decrypt_btn.grid(row=4, column=0, sticky="ew", padx=10, pady=2)
-
-        aes_decrypt_btn = customtkinter.CTkButton(scrollable_frame, text="AES Decrypt", anchor="w",
-                                                  command=lambda: self.add_recipe_step("AES Decrypt"))
-        aes_decrypt_btn.grid(row=5, column=0, sticky="ew", padx=10, pady=2)
+        # --- Section: Asymmetric Decryption ---
+        asymmetric_frame = CollapsibleFrame(scrollable_frame, text="Asymmetric Decryption")
+        asymmetric_frame.pack(fill="x", pady=(0, 5))
+        add_button(asymmetric_frame.content_frame, "RSA Decrypt", lambda: self.add_recipe_step("RSA Decrypt"))
 
     def load_recipe(self):
         filepath = filedialog.askopenfilename(title="Load and Invert Recipe", filetypes=[("JSON files", "*.json")])
