@@ -10,7 +10,7 @@
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg?style=for-the-badge)
 
 
-<img src="./apps/assets/header-dark.webp" width="75%" alt="SecureSuite Header" >
+<img src="./assets/header-dark.webp" width="75%" alt="SecureSuite Header" >
 
 </div>
 
