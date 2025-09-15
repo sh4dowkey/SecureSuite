@@ -1,26 +1,36 @@
-import tkinter
-
-import cv2
 import os
-import tkinter as tk
-from tkinter import messagebox, filedialog
-from PIL import Image, ImageTk
-import ttkbootstrap as ttk
-from ttkbootstrap.scrolled import ScrolledText
-import threading
-from tkinterdnd2 import DND_FILES, TkinterDnD
 import subprocess
 import sys
+import threading
+import tkinter
+import tkinter as tk
 import webbrowser
+from tkinter import messagebox, filedialog
+
+import cv2
+import ttkbootstrap as ttk
+from PIL import Image, ImageTk
+from tkinterdnd2 import DND_FILES, TkinterDnD
+from ttkbootstrap.scrolled import ScrolledText
 
 # Import the core logic from our new core.py file
 from .core import encrypt_message, decrypt_message, encode_lsb, decode_lsb
-from ...cryptosuite.app import resource_path
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        # Get the project root (go up 4 levels from this file)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        base_path = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+
+    return os.path.join(base_path, relative_path)
 
 
 class SteganographyApp(TkinterDnD.Tk):
     """A secure steganography tool with a modern GUI."""
-
 
     def __init__(self):
         super().__init__()
@@ -28,11 +38,10 @@ class SteganographyApp(TkinterDnD.Tk):
         self.title("Steganography Suite")
         self.minsize(900, 700)
 
-        # --- FIX: Hide the window immediately after creation ---
+        # --- Hide the window immediately after creation ---
         self.withdraw()
 
         # --- NEW: Set the application icon ---
-        # This path is relative from where main.py is run (the project root)
         try:
             if "win" in sys.platform:
                 self.iconbitmap(resource_path("assets/logo.ico"))
@@ -49,8 +58,8 @@ class SteganographyApp(TkinterDnD.Tk):
         # Center window
         self.withdraw()
         self.update_idletasks()
-        app_width = 2500
-        app_height = 1200
+        app_width = 1400
+        app_height = 900
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x_pos = (screen_width // 2) - (app_width // 2)
@@ -67,9 +76,8 @@ class SteganographyApp(TkinterDnD.Tk):
 
         self._create_main_content_widgets()
 
-        # --- FIX: Reveal the window only when it is fully built ---
+        # --- Reveal the window only when it is fully built ---
         self.deiconify()
-
 
     def _create_menu_bar(self):
         menu_bar = tk.Menu(self)
@@ -157,8 +165,11 @@ class SteganographyApp(TkinterDnD.Tk):
 
     def launch_cryptosuite(self):
         try:
+            # Get the correct project root path
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+
             module_path = "apps.cryptosuite.main"
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             subprocess.Popen([sys.executable, "-m", module_path], cwd=project_root)
             self._update_status("Launched CryptoSuite app...")
         except Exception as e:
@@ -299,7 +310,7 @@ class SteganographyApp(TkinterDnD.Tk):
         viewer.grid_rowconfigure(0, weight=1)
         viewer.grid_columnconfigure(0, weight=1)
 
-        viewer.drop_target_register(DND_FILES);
+        viewer.drop_target_register(DND_FILES)
         viewer.dnd_bind('<<Drop>>', dnd_cmd)
 
         container = ttk.Frame(viewer, bootstyle="secondary", relief="sunken", padding=5)
@@ -324,11 +335,13 @@ class SteganographyApp(TkinterDnD.Tk):
 
     def _update_status(self, message, bootstyle="default"):
         self.status_bar.config(text=message, bootstyle=bootstyle)
-        if self.status_timer: self.after_cancel(self.status_timer)
+        if self.status_timer:
+            self.after_cancel(self.status_timer)
         self.status_timer = self.after(15000, lambda: self.status_bar.config(text="Ready", bootstyle="default"))
 
     def _on_resize(self, event):
-        if self.resize_timer: self.after_cancel(self.resize_timer)
+        if self.resize_timer:
+            self.after_cancel(self.resize_timer)
         self.resize_timer = self.after(250, self._perform_resize)
 
     def _perform_resize(self):
@@ -336,11 +349,12 @@ class SteganographyApp(TkinterDnD.Tk):
         self._update_image_preview(self.img_label_decrypt, self.original_pil_decrypt, self.img_container_decrypt)
 
     def _update_image_preview(self, label, pil_img, container):
-        if not pil_img or container.winfo_width() < 50 or container.winfo_height() < 50: return
+        if not pil_img or container.winfo_width() < 50 or container.winfo_height() < 50:
+            return
         img_copy = pil_img.copy()
         img_copy.thumbnail((container.winfo_width() - 10, container.winfo_height() - 10), Image.LANCZOS)
         tk_img = ImageTk.PhotoImage(img_copy)
-        label.config(image=tk_img, text="");
+        label.config(image=tk_img, text="")
         label.image = tk_img
 
     def _load_image(self, path, is_encrypt=True):
@@ -359,24 +373,26 @@ class SteganographyApp(TkinterDnD.Tk):
             self._update_status(f"Failed to load image: {e}", "danger")
 
     def _select_handler(self, is_encrypt=True):
-        path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.bmp;*.jpg")])
-        if path: self._load_image(path, is_encrypt)
+        path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png *.bmp *.jpg *.jpeg")])
+        if path:
+            self._load_image(path, is_encrypt)
 
     def encrypt_and_save(self):
         message = self.msg_entry.text.get("1.0", "end-1c")
         if not all((self.img_encrypt is not None, message, self.pass_entry.get())):
-            self._update_status("Input Required: Please fill all fields.", "warning");
+            self._update_status("Input Required: Please fill all fields.", "warning")
             return
         path = filedialog.asksaveasfilename(defaultextension=".png",
                                             filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
         if path:
             if path.lower().endswith(('.jpg', '.jpeg')) and not messagebox.askyesno("Warning",
-                                                                                    "Saving as JPEG may corrupt data.\nContinue?"): return
+                                                                                    "Saving as JPEG may corrupt data.\nContinue?"):
+                return
             threading.Thread(target=self._encrypt_thread, args=(path, message)).start()
 
     def decrypt_and_reveal(self):
         if not all((self.img_decrypt is not None, self.decrypt_pass_entry.get())):
-            self._update_status("Input Required: Please select an image and enter password.", "warning");
+            self._update_status("Input Required: Please select an image and enter password.", "warning")
             return
         threading.Thread(target=self._decrypt_thread).start()
 
@@ -391,7 +407,7 @@ class SteganographyApp(TkinterDnD.Tk):
             self.after(0, lambda: self._update_status("Image saved successfully!", "success"))
         else:
             self.after(0, lambda: self._update_status("Error: Message is too large for this image.", "danger"))
-        self.progress_encrypt.stop();
+        self.progress_encrypt.stop()
         self.progress_encrypt.grid_forget()
 
     def _decrypt_thread(self):
@@ -410,14 +426,15 @@ class SteganographyApp(TkinterDnD.Tk):
                 self.after(0, lambda: self._update_status("Decryption Failed: Data is corrupted.", "danger"))
         else:
             self.after(0, lambda: self._update_status("Decryption Failed: No hidden message found.", "danger"))
-        self.progress_decrypt.stop();
+        self.progress_decrypt.stop()
         self.progress_decrypt.grid_forget()
 
     def _toggle_password(self, entry, var):
         entry.config(show="" if var.get() else "*")
 
     def _on_key_release(self, event=None):
-        if self.debounce_timer: self.after_cancel(self.debounce_timer)
+        if self.debounce_timer:
+            self.after_cancel(self.debounce_timer)
         self.debounce_timer = self.after(250, self._update_msg_size_indicator)
 
     def _update_msg_size_indicator(self):
@@ -433,7 +450,7 @@ class SteganographyApp(TkinterDnD.Tk):
     def _clear(self, is_encrypt=True):
         if is_encrypt:
             self.img_encrypt, self.original_pil_encrypt, self.max_bytes = None, None, 0
-            self.msg_entry.text.delete("1.0", "end");
+            self.msg_entry.text.delete("1.0", "end")
             self.pass_entry.delete(0, 'end')
             self.img_label_encrypt.config(image='', text="\n\nDrag & Drop Image Here\nor Click Below")
             self._update_msg_size_indicator()
